@@ -1,0 +1,12 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ShoeFlow · 15秒提示词工作台</title><link rel="stylesheet" href="/style.css"></head><body>
+<header><b>ShoeFlow <span>提示词工作台</span></b><small>独立版 · 每组最多 15 秒</small></header>
+<main><aside><h2>已保存任务</h2><button id="fresh">＋ 新建文案</button><div id="history"></div></aside><article>
+<h1>把口播变成可直接复制的提示词。</h1><p class="muted">分镜、素材编号、背景、对白、声音与衔接说明一次整理好。你负责在视频平台上传素材、粘贴生成。</p>
+<details><summary>大语言模型设置</summary><div class="grid"><label>API 地址<input id="endpoint" placeholder="https://…/v1/chat/completions"></label><label>模型名称<input id="model" placeholder="填写模型名称"></label><label>API Key<input id="key" type="password" autocomplete="off"></label></div><small>设置保存在当前浏览器，任务文件不包含 API Key。</small></details>
+<section><label>口播文案<textarea id="script" rows="7" placeholder="粘贴你的完整口播文案，保持原话生成分镜…"></textarea></label>
+<div class="grid"><label>商品参考图（最多8张）<input id="products" type="file" accept="image/png,image/jpeg,image/webp" multiple></label><label>人物形象参考（1张）<input id="portrait" type="file" accept="image/png,image/jpeg,image/webp"></label></div><div id="mediaPreview"></div><button id="clearMedia" type="button">清空参考图</button><p class="muted">图片会发送给你配置的大语言模型，请选择支持图片输入的视觉模型。单张最多5MB；已上传图片随任务保存在本地。</p>
+<div class="grid"><label>商品参考图数量<input id="count" type="number" min="0" max="8" value="1"></label><label>人物参考<select id="avatar"><option value="yes">会上传已授权人物素材</option><option value="no">不上传人物素材</option></select></label><label>跨组衔接<select id="mode"><option value="reference">尾帧＋原始参考（与主软件默认一致）</option><option value="first_frame">后续只使用尾帧作为首帧</option></select></label></div>
+<p class="muted">上传图片后，人物与商品数量自动按图片确定；不上传时仍可仅按文案生成。请按每组列出的顺序在视频平台添加素材；第二组起的尾帧需要你生成上一组后自行取得。</p>
+<button id="generate" class="primary">生成并保存提示词</button><span id="status" role="status" aria-live="polite"></span></section>
+<div id="results"></div><details id="editor" hidden><summary>编辑完整分镜并另存为新任务</summary><p>修改 JSON 中的画面、背景、对白或时长，再重新整理提示词。单镜不能超过15秒。</p><textarea id="board" rows="16" spellcheck="false"></textarea><button id="compile">重新分组并另存</button></details>
+</article></main><script type="module" src="/app.js"></script></body></html>
