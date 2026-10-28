@@ -1,40 +1,60 @@
 ---
-name: shoeflow-15s-prompt
-description: Generate grounded Chinese e-commerce video storyboards and copy-ready Seedance prompts from a script and optional product or person reference images. Use when an agent needs short-video shot planning, multimodal product grounding, natural livestream-style performance, or clips limited to 15 seconds per generation.
-license: MIT
+name: hypit-prompt
+description: 按 Hypit 方法分析参考视频与产品图，将动作、运镜和声画节奏展开为独立可用的生成提示词，遵循指定的 Doubao Seedance 2 指南。参考视频仅供分析，成稿不引用视频；适用于不同 Agent 或 API 应用中的提示词创作。
 ---
 
-# ShoeFlow 15s Prompt Skill
+# Hypit 参考复刻提示词
 
-Use this skill to turn a complete product-sales script into structured shots and provider-ready prompts. It is provider-agnostic at the planning stage: the output can be copied into Seedance or adapted to another video model.
+输入参考视频、产品图和用户的简要要求；先理解原片，再输出能直接用于生成的中文提示词。默认延续原片的事件、人物互动、商品揭示、运镜和剪辑节奏，只调整用户指定的内容及产品替换所必需的部分。用户要求重新创作时才扩大改编范围。
 
-## Core workflow
+**参考视频只供分析，不作为生成模型的输入。** 最终提示词必须完整描述从视频中观察到的场景、人物动作、运镜、切镜、对话和声音节奏，不出现任何依赖原视频的指令，包括“视频1”“@Video1”“参考原片”“动作/运镜同参考”“保留原视频音轨”“严格编辑/延长视频”及视频文件名、路径或链接。产品图、另行提供的模特图仍可按实际上传顺序写成“图片1”等。此规则按用户明确要求设定，优先于所附指南中的视频引用示例。
 
-1. Read the whole script before splitting it. Preserve every spoken word in order; never invent product claims.
-2. Inspect supplied product and person images. Use them only as visual evidence. If a detail is hidden or unclear, say so internally and do not guess.
-3. Create a continuous storyboard. Each shot has one visible action, an observable endpoint, duration, dialogue, background, camera, sound, performance, continuity, reference role, and preservation constraints.
-4. Group consecutive shots without reordering them. Each group must be 15 seconds or less. A single shot over 15 seconds must be split or reported as an error; never silently shorten dialogue.
-5. Compile one complete prompt per group. Include the group timecodes, reference roles, home or ordinary car setting, natural light, dialogue, action timing, and the last state needed for continuation.
-6. Present each group separately with a copy action or a plain text block. For group two onward, tell the user to use the accepted previous clip's actual tail frame as the next opening reference when the target provider supports it.
+## 跨平台使用
 
-## Natural seller performance
+本技能是自然语言工作流，不依赖Codex、桌面浏览器、某个API供应商、固定操作系统或本机路径。所有配套资料相对于本文件定位。先阅读 [媒体分析与运行环境](references/media-analysis.md)，根据当前环境实际能力选择视频/音频原生理解、Hypit或其他媒体工具。没有Hypit时仍按文档中的分析方法执行；没有媒体读取能力时不能仅凭文本猜视频内容。
 
-Treat ordinary product selling as non-narrative observation and demonstration. Human realism comes from visible carriers: eyeline, small facial changes, breathing, a purposeful product operation, and a clear action ending. Synchronize the glance or hand movement with the spoken selling point. Keep one short, coherent action chain per shot. Do not force three actions, a fixed emotional curve, invented drama, exaggerated surprise, or generic phrases such as “very expressive.” During lip sync, prefer a stable medium or medium close shot and avoid turning away, covering the mouth, or fast camera movement.
+支持技能目录的Agent可加载本文件并按需读引用资料；普通API应用需由调用方把这些规则和相关参考文档载入指令上下文，同时提供可访问的媒体、转写或抽帧结果。仅把技能名称或本机文件路径写进提示词不会让远程模型自动获得文件。客户端元数据属于可选适配，不是本技能的运行前提。
 
-## Scene defaults
+## 边界与依据
 
-When the script does not specify a location, use an ordinary lived-in living room with a sofa, curtains, a small table, and window daylight. If the script explicitly asks for a car, use a parked private car with visible seats, windows, and natural daylight. Do not add a shoe shop, showroom display, studio, ring light, light stand, commercial set, luxury room, or cinematic lighting by default.
+- 使用 Hypit 的参考分析和视频导演方法。本技能的交付到提示词为止，不调用生成API，不启动随变桥接，不上传素材，不创建视频节点，不开启Studio或执行成片构建。用户另行明确要求生成时再转入相应制作技能。
+- 必读 [用户指南执行规则](references/guide-rules.md)。该文件提炼自用户指定的《Doubao Seedance 2 prompt.docx》，并应用了用户随后明确的“视频只供分析、成稿不引用视频”要求；完整文本见 [指南原文](references/guide-source.md)。原文保留供核对，其视频参考、严格编辑和延长句式不适用于本技能的成稿。其他主体定义、分镜与声音写法仍按指南执行。
+- 本技能的 [媒体分析与运行环境](references/media-analysis.md) 已包含本任务需要的分析方法；不要求另装其他技能。当前环境有Hypit时，可查阅其参考分析与视频导演说明并复用已授权的本地媒体能力，只沿用分析与提示词创作，不因其制作流程而启动生成服务。
+- 其他模型技能只补充当前任务确有需要的细节；不能改变本技能“只输出提示词”的范围，也不能覆盖用户指南的任务句式、分镜和声音符号。若用户指定其他模型，采用该模型经过确认的写法，不把Seedance语法称作通用官方格式。
+- 指南是用户提供的版本。可说明“按你提供的指南编写”，不能声称它是已联网核实的最新官方文档，也不能称最终原创提示词为官方原文。
 
-## Reference-image rules
+## 先看素材，再写提示词
 
-- Product images constrain visible shape, color, laces, sole pattern, and legible marks.
-- Person images constrain visible face, hair, clothing, and identity appearance only when the user is authorized to use them.
-- Do not infer materials, performance, comfort, price, brand ownership, identity, occupation, or other unseen facts from an image.
-- Do not copy a reference image's store, studio, lighting equipment, or background unless the user explicitly requests it.
-- Number references by their order in the current provider request (`图片1`, `图片2`, etc.); do not expose private asset IDs in prompt prose.
+1. **确定本次材料。** 找到当前指定视频和产品图，沿用对话中已确认且仍适用的品牌称呼、禁用内容、模型及替换范围。多条候选视频无法判断主参考时才询问。核对文件可读取；不能把文件名、历史分析或前几个抽帧当作完整看过本次视频。
+2. **观察完整起承转合。** 用当前媒体读取工具获取时长、画幅和音轨；覆盖从开场到结尾的画面与声音。录屏素材要分清真正的视频画面与播放器、榜单和鼠标等界面。按事件和镜头边界检查，关键动作、切镜、说话人交接处加密抽帧或查看短片段；观看实际输出图像。有Hypit时可用其media命令，没有则用等效工具；先查当前工具说明，不猜参数。
+3. **读懂台词和声音。** 有对白时结合实际听审与可用的时间戳转写核对说话人、问答顺序、画外音和停顿。可使用已经可用且在授权范围内的分析服务；不要为写提示词自动购买服务或安装大型模型。只有字幕可读时标明内部证据来自字幕，不能声称听审完成；关键台词无法确认时只问缺失部分，不补造原句。无对白则分析动作与声音节奏，不强行编剧情。
+4. **检查商品图。** 记录可见形状、配色、材质外观、结构、标识及位置。多角度图绑定为同一件产品；不把拼图当作最终画面或多个商品。不从外观推断性能、售价、销量、活动、认证或亲身使用效果。实际商品名与鞋身/瓶身文字不同可分别绑定，使用用户确认的信息。
+5. **形成简短事实记录。** 内部保留“源视频时间/事件 → 画面与声音证据 → 本次保留或替换”的对应关系，区分观察、解释和新创意。原片中的价格、性能与销售话术不自动变成本品事实。只询问会改变最终成品的缺失信息；可以安全省略的未知信息不必阻塞。复杂任务可在当前项目保存简短分析与提示词，简单任务无需建立完整Hypit生产项目。
 
-## Output contract
+## 从分析到可执行描述
 
-Return structured JSON for the storyboard when the caller requests machine-readable output. For human output, show the per-group prompt, duration, shot range, reference upload order, and a concise note about the next tail-frame handoff. Keep prompts concrete and remove filler adjectives.
+- **将复刻要求转成独立拍摄描述。** “只换产品，其他不变”意味着在文字中尽量还原已观察到的场景、动作、人物关系和镜头，再绑定新产品，不改写为严格编辑原视频。描述是生成目标，不能承诺逐帧或像素级一致。用户要后续情节时明确写出本段的起始场景和动作，不引用前一个视频让模型自行理解。
+- **只绑定实际生成图片。** 产品图和另行提供的模特/场景图按实际或约定的上传顺序编号，职责写进提示词。参考视频及其片段、音轨不列入生成素材清单，不再询问用户是否要把原片上传给生成模型。产品图单独上传时通常为“图片1”，不能因分析视频排在前面而错位。
+- **展开观察，不只删除引用。** 用具体主体动作、景别、机位、运动方向、跟随对象、开始/停止时机和镜头承接替代视频引用；声音同样写清说话人、台词及可核实的环境声。不能删掉“视频1”后只剩“自然运镜”“同样节奏”等泛词。当前证据不足以写明关键动作或运镜时，回看相应片段或问缺失信息，不编造、不退回原视频引用。
+- **保持原片的动机。** 复刻谁先发现、谁回答、何时把注意力交给产品、下一镜如何承接；不要把双人交流改成单人演讲，也不要自动加入慢动作、产品转台、英雄镜头或新的价格反转。
+- **把运镜写成摄影动作。** 依据源片写清景别、机位、一个主运动及其跟随对象。手持感来自摄影师对主体动作的反应、轻微重构图和自然重心变化，不等于随机抖动。不要给固定镜头强加晃动，也不要把人物走动误写成镜头运动。每镜围绕一个主运镜组织先后动作，避免同时堆叠推拉摇移。
+- **明确人物与声音归属。** 按指南给每人稳定标签和2–3个可辨认特征，每句台词绑定具体标签并用 `{}` 包裹；说完后另一人才接话。按原片保留听者反应，画外音也注明具体说话人。不能用“B全程不说话”来解决重叠，除非原片或用户本就要求B沉默。
+- **控制动作与时间。** 保留关键动作的幅度、速度及承接关系。指南偏好低缓连续动作，但不能因此擅自删除源片核心动作；必要时减少同镜的次要动作。原片时间码用于分析定位，默认不把精确秒段硬塞给模型。分镜用“镜头1、镜头2”及事件顺序，总时长依用户要求或原片节奏估计，不能为了省事统一成4秒测试。长片需分段时按有意义的切点组织，而非机械等分。
+- **保留需要的品牌。** 不将指南中的“不要生成Logo”无差别套给商品。明确保留商品图上的指定标识，同时排除用户不需要的服饰标识、其他品牌或平台水印。图中原有标志不能保证仅靠否定提示词清除；确实影响任务时简短指出素材问题，不擅自生图修改。
 
-The bundled `standalone-15s` application is an optional reference implementation. Run it with `npm install` and `npm start`; it serves a local prompt workbench on port 4174. It never submits a paid video-generation request.
+## 写出并核对最终提示词
+
+使用 [用户指南执行规则](references/guide-rules.md) 的结构：生成目标与图片职责 → 主体绑定 → 具体镜头顺序及对应声音 → 必要的风格与保留/排除条件。简单单镜头直接用连贯短段落；不为了格式增加镜头或填满所有栏目。
+
+交付前自查：
+
+- 每个主要镜头是否能对应原片事件或用户明确的新要求？新增内容是否必要？
+- 素材编号、同一主体的多个角度、角色名及台词说话人是否一致？
+- 替换后商品是否仍是图中这一件，原片卖点是否被误迁移？
+- 台词长度和动作数量是否适合总时长，是否误写合唱或抢话？
+- 镜头能否按叙述先后执行，是否同时要求固定/移动、保留/删除同一项？
+- 假设生成模型完全看不到原片，仅有本提示词和列明图片，是否能理解每个事件和镜头？是否仍有显式视频编号或隐式“同原片/保持原样”等依赖？
+- 是否默认不用强制精确秒段，并按指南正确使用主体标签、分镜和声音符号？
+- 是否删除无法在画面或声音中实现的空泛夸词及重复禁令？
+
+默认最终只交付一个完整的 `text` 代码块，让用户直接复制；正文中的图片绑定应自足且与上传顺序一致。不提分析过程或原片来源，不把“无需上传原视频”等操作说明写进生成提示词。确需多段生成时每段一个可独立使用的完整代码块，保留一致性信息，不用“其余同上”。不把分析报告、评分、JSON、内部导演记录或待填空模板混进成稿。必要的缺失信息先问清；用户要求看分析时才展示简明、可核对的依据。输出后停止，不继续提交生成。
